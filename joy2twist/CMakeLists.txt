@@ -18,6 +18,8 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(joy_linux REQUIRED)
+find_package(twist_mux_msgs REQUIRED)
+find_package(rclcpp_action REQUIRED)
 include_directories(include)
 
 add_executable(
@@ -33,6 +35,8 @@ ament_target_dependencies(joy2twist
   geometry_msgs  
   sensor_msgs
   joy_linux
+  twist_mux_msgs
+  rclcpp_action
 )
 
 install(TARGETS joy2twist

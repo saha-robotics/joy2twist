@@ -12,6 +12,9 @@ Joy2TwistNode::Joy2TwistNode() : Node("joy2twist_node")
   joy_sub_ = create_subscription<MsgJoy>("joy", rclcpp::SensorDataQoS(), std::bind(&Joy2TwistNode::joy_cb, this, _1));
   twist_pub_ = create_publisher<MsgTwist>("cmd_vel", rclcpp::QoS(rclcpp::KeepLast(1)).durability_volatile().reliable());
 
+  //Action client for change joy priority
+  joy_priority_client_ = rclcpp_action::create_client<twist_mux_msgs::action::JoyPriority>(this, "joy_priority_action");
+
   RCLCPP_INFO(get_logger(), "Initialized node!");
 
   driving_mode_ = false; // Başlangıçta sürüş modu pasif 
@@ -52,13 +55,22 @@ void Joy2TwistNode::load_parameters()
 void Joy2TwistNode::joy_cb(const MsgJoy::SharedPtr joy_msg)
 {
   MsgTwist twist_msg;
+  auto goal = twist_mux_msgs::action::JoyPriority::Goal();
+
+  auto send_goal_options = rclcpp_action::Client<twist_mux_msgs::action::JoyPriority>::SendGoalOptions();
+  send_goal_options.goal_response_callback = [](auto) {RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Goal sent");};
+  send_goal_options.result_callback = [](auto) {RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Result received");};
 
   // Dead man switch'e ilk basıldığında veya tekrar basıldığında sürüş modunu değiştir
   if (joy_msg->buttons.at(button_index_.dead_man_switch)) {
     if (!driving_mode_) {
       driving_mode_ = true;
+      // send goal
+      joy_priority_client_->async_send_goal(goal, send_goal_options);
     } else {
       driving_mode_ = false;
+      // send goal
+      joy_priority_client_->async_send_goal(goal, send_goal_options);
     }
   }
 
@@ -66,10 +78,10 @@ void Joy2TwistNode::joy_cb(const MsgJoy::SharedPtr joy_msg)
   if (driving_mode_) {
     convert_joy_to_twist(joy_msg, twist_msg);
     twist_pub_->publish(twist_msg);
-  } else {
+      } else {
     // Eğer sürüş modu pasifse, twist mesajını yayınlamayı unutma
     twist_pub_->publish(twist_msg);
-  }
+      }
 
 }
 

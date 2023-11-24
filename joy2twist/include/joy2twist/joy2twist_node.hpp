@@ -9,6 +9,8 @@
 
 #include <geometry_msgs/msg/twist.hpp>
 #include <sensor_msgs/msg/joy.hpp>
+#include "rclcpp_action/rclcpp_action.hpp"
+#include <twist_mux_msgs/action/joy_priority.hpp>
 
 namespace joy2twist
 {
@@ -47,6 +49,7 @@ private:
 
   rclcpp::Subscription<MsgJoy>::SharedPtr joy_sub_;
   rclcpp::Publisher<MsgTwist>::SharedPtr twist_pub_;
+  rclcpp_action::Client<twist_mux_msgs::action::JoyPriority>::SharedPtr joy_priority_client_;
 };
 
 static constexpr char FAST[]{"fast"};
