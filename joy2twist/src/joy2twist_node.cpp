@@ -73,13 +73,16 @@ void Joy2TwistNode::joy_cb(const MsgJoy::SharedPtr joy_msg)
   }
 
   // Eğer sürüş modu aktifse, joy verilerini kullanarak twist mesajını oluştur ve yayınla
-  if (driving_mode_) {
+  if (driving_mode_) 
+  {
     convert_joy_to_twist(joy_msg, twist_msg);
     twist_pub_->publish(twist_msg);
-      } else {
+  } 
+  else 
+  {
     // Eğer sürüş modu pasifse, twist mesajını yayınlamayı unutma
-    twist_pub_->publish(twist_msg);
-      }
+    // twist_pub_->publish(twist_msg);
+  }
 
 }
 
