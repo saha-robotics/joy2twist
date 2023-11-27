@@ -24,7 +24,7 @@ def generate_launch_description():
         name="joy_teleop",
         parameters=[LaunchConfiguration("joy2twist_params_file")],
         namespace=LaunchConfiguration('prefix'),
-        remappings=[('cmd_vel', 'input_joy/cmd_vel')],
+        remappings=[('cmd_vel', 'twist/joy_vel')],
         emulate_tty="true",
     )
 
